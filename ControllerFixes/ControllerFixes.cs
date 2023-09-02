@@ -10,16 +10,18 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
     public void OnLoadGlobal(GlobalSettings s) => settings = s;
     public GlobalSettings OnSaveGlobal() => settings;
     
-    public ControllerFixes() : base("Controller Fixes") { }
-	public override string GetVersion() => "1.0.0.1";
+    public ControllerFixes() : base("Controller Fixes")
+	{
+        // The following fixes some controllers (e.g. Xbox) not working on Mac
+        ReflectionHelper.SetProperty<bool>(typeof(InputManager), "NativeInputEnableMFi", true);
+        InputManager.Reload();
+    }
+
+	public override string GetVersion() => "1.0.1.0";
 
     public override void Initialize()
     {
         Instance ??= this;
-
-        // The following fixes some controllers (e.g. Xbox) not working on Mac
-        ReflectionHelper.SetProperty<bool>(typeof(InputManager), "NativeInputEnableMFi", true);
-        InputManager.Reload();
 
         On.ControllerDetect.LookForActiveController += LookForActiveController;
 
