@@ -11,7 +11,7 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
     public GlobalSettings OnSaveGlobal() => settings;
     
     public ControllerFixes() : base("Controller Fixes") { }
-    public override string GetVersion() => AssemblyUtils.GetAssemblyVersionHash();
+	public override string GetVersion() => "1.0.0";
 
     public override void Initialize()
     {
