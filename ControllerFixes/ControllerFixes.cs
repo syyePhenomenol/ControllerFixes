@@ -17,7 +17,7 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
         InputManager.Reload();
     }
 
-	public override string GetVersion() => "1.0.1.0";
+	public override string GetVersion() => "1.0.2.0";
 
     public override void Initialize()
     {

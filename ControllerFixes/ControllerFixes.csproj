@@ -3,7 +3,7 @@
         <ProjectGuid>{B66C8E1B-C360-4881-B21F-8C1583AE2398}</ProjectGuid>
         <RootNamespace>ControllerFixes</RootNamespace>
         <AssemblyTitle>ControllerFixes</AssemblyTitle>
-        <AssemblyVersion>0.0.1.0</AssemblyVersion>
+        <AssemblyVersion>1.0.2.0</AssemblyVersion>
         <Deterministic>true</Deterministic>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <LangVersion>latest</LangVersion>
@@ -11,8 +11,6 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>CS1591</NoWarn>
         <OutputDirectory>$(HollowKnightFolder)/Mods</OutputDirectory>
-
-
     </PropertyGroup>
 
     <!-- Same References -->
@@ -101,7 +99,7 @@
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)/Output/" />
         <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ProjectDir)/Output/" />
         <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ProjectDir)/Output/" />
-        <Copy SourceFiles="$(SolutionDir)/README.md" DestinationFolder="$(ProjectDir)/Output/" ContinueOnError="true" />
+        <Copy SourceFiles="$(ProjectDir)/../README.md" DestinationFolder="$(ProjectDir)/Output/" ContinueOnError="true" />
         <ZipDirectory DestinationFile="$(ProjectDir)/$(TargetName).zip" SourceDirectory="$(ProjectDir)/Output" />
         <RemoveDir Directories="$(ProjectDir)Output" />
 
