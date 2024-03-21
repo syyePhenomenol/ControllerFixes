@@ -10,103 +10,133 @@
         <TargetFramework>net472</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>CS1591</NoWarn>
-        <OutputDirectory>$(HollowKnightFolder)/Mods</OutputDirectory>
     </PropertyGroup>
+
+    <Import Project="LocalOverrides.targets" Condition="Exists('LocalOverrides.targets')" />
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>portable</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\Release\</OutputPath>
+		<DefineConstants>TRACE;RELEASE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+
+	<Target Name="CopyMod" AfterTargets="PostBuildEvent">
+		<RemoveDir Directories="$(ExportDir)/$(TargetName)/" />
+		<MakeDir Directories="$(ExportDir)/$(TargetName)/" />
+		<MakeDir Directories="$(ExportDir)/$(TargetName)/zip/" />
+		<MakeDir Condition="!Exists('$(HollowKnightRefs)/Mods/$(TargetName)/')" Directories="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+		<Copy SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ExportDir)/$(TargetName)/" />
+		<Copy SourceFiles="../README.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+		<ZipDirectory SourceDirectory="$(ExportDir)/$(TargetName)/zip/" DestinationFile="$(ExportDir)/$(TargetName)/$(TargetName).zip" />
+		<RemoveDir Directories="$(ExportDir)/$(TargetName)/zip/" />
+
+		<GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).zip" Algorithm="SHA256">
+			<Output TaskParameter="Items" ItemName="FilesWithHashes" />
+		</GetFileHash>
+		<WriteLinesToFile File="$(ExportDir)/$(TargetName)/SHA.txt" Lines="@(FilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8" />
+
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+			<Output TaskParameter="Assemblies" ItemName="Targets" />
+		</GetAssemblyIdentity>
+		<ItemGroup>
+			<VersionNumber Include="@(Targets->'%(Version)')" />
+		</ItemGroup>
+		<WriteLinesToFile File="$(ExportDir)/$(TargetName)/version.txt" Lines="@(VersionNumber)" Overwrite="true" Encoding="UTF-8" />
+	</Target>
+
+  <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
+		</ItemGroup>
+  </Target>
 
     <!-- Same References -->
     <ItemGroup>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\Assembly-CSharp.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="MMHOOK_PlayMaker, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\MMHOOK_PlayMaker.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\MMHOOK_PlayMaker.dll</HintPath>
         </Reference>
         <Reference Include="Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-            <HintPath>$(HollowKnightFolder)\Mono.Cecil.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\Mono.Cecil.dll</HintPath>
         </Reference>
         <Reference Include="MonoMod.RuntimeDetour, Version=21.4.29.1, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\MonoMod.RuntimeDetour.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\MonoMod.RuntimeDetour.dll</HintPath>
         </Reference>
         <Reference Include="MonoMod.Utils, Version=21.4.29.1, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\MonoMod.Utils.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\MonoMod.Utils.dll</HintPath>
         </Reference>
         <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\PlayMaker.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\PlayMaker.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.AudioModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.AudioModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.ImageConversionModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.IMGUIModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.JSONSerializeModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.JSONSerializeModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.ParticleSystemModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.ParticleSystemModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.Physics2DModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.Physics2DModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.TextRenderingModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.TextRenderingModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.UI.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.UI.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.UIModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.UIModule.dll</HintPath>
         </Reference>
         <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\MMHOOK_Assembly-CSharp.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\MMHOOK_Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\Newtonsoft.Json.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>$(HollowKnightFolder)\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\UnityEngine.InputLegacyModule.dll</HintPath>
         </Reference>
         <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-            <HintPath>$(HollowKnightFolder)\netstandard.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\netstandard.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>$(HollowKnightFolder)\mscorlib.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\mscorlib.dll</HintPath>
         </Reference>
         <Reference Include="Satchel">
-            <HintPath>$(HollowKnightFolder)\Mods\Satchel\Satchel.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\Mods\Satchel\Satchel.dll</HintPath>
         </Reference>
         <Reference Include="HKMirror">
-            <HintPath>$(HollowKnightFolder)\Mods\HKMirror\HKMirror.dll</HintPath>
+            <HintPath>$(HollowKnightRefs)\Mods\HKMirror\HKMirror.dll</HintPath>
         </Reference>
     </ItemGroup>
-
-    <Target Name="CopyMod" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).xml" DestinationFolder="$(OutputDirectory)\$(TargetName)" SkipUnchangedFiles="true" />
-    </Target>
-
-    <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
-        <MakeDir Directories="$(ProjectDir)Output" />
-        <Delete Files="$(ProjectDir)/$(TargetName).zip" />
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)/Output/" />
-        <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ProjectDir)/Output/" />
-        <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ProjectDir)/Output/" />
-        <Copy SourceFiles="$(ProjectDir)/../README.md" DestinationFolder="$(ProjectDir)/Output/" ContinueOnError="true" />
-        <ZipDirectory DestinationFile="$(ProjectDir)/$(TargetName).zip" SourceDirectory="$(ProjectDir)/Output" />
-        <RemoveDir Directories="$(ProjectDir)Output" />
-
-        <GetFileHash Files="$(ProjectDir)/$(TargetName).zip" Algorithm="SHA256">
-            <Output TaskParameter="Items" ItemName="FilesWithHashes" />
-        </GetFileHash>
-        <Message Importance="High" Text="@(FilesWithHashes-&gt;'%(Identity): %(FileHash)')" />
-    </Target>
 
 </Project>
