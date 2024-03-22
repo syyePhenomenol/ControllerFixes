@@ -204,7 +204,7 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
 				        {
 					        Sprite[] array9 = new Sprite[]
 					        {
-						        settings.SteamNintendoLayout ? uIButtonSkins.switchHidA : uIButtonSkins.switchHidB,
+						        settings.SteamNintendoLayout ? uIButtonSkins.switchHidB : uIButtonSkins.switchHidA,
 						        uIButtonSkins.ps4x,
 						        uIButtonSkins.a,
 					        };
@@ -215,7 +215,7 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
 				        {
 					        Sprite[] array10 = new Sprite[]
 					        {
-						        settings.SteamNintendoLayout ? uIButtonSkins.switchHidB : uIButtonSkins.switchHidA,
+						        settings.SteamNintendoLayout ? uIButtonSkins.switchHidA : uIButtonSkins.switchHidB,
 						        uIButtonSkins.ps4circle,
 						        uIButtonSkins.b,
 					        };
