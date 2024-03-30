@@ -33,6 +33,8 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
         ILUIButtonSkins.orig_GetButtonSkinFor += GetButtonSkinForIL;
 
 		On.ControllerButtonLabel.ShowCurrentBinding += ShowCurrentBinding;
+
+		On.ActionButtonIconBase.GetButtonIcon += OverrideMenuPrompts;
     }
 
     private bool CanCast(On.HeroController.orig_CanCast orig, HeroController self)
@@ -360,6 +362,26 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
 		orig(self);
 
 		self.controllerButton = origLabel;
+    }
+
+    private void OverrideMenuPrompts(On.ActionButtonIconBase.orig_GetButtonIcon orig, ActionButtonIconBase self, HeroActionButton actionButton)
+    {
+		if (self is MenuButtonIcon && settings.OverrideMenuPrompts)
+		{
+			switch (actionButton) 
+			{
+				case HeroActionButton.JUMP:
+					orig(self, HeroActionButton.MENU_SUBMIT);
+					return;
+				case HeroActionButton.CAST:
+					orig(self, HeroActionButton.MENU_CANCEL);
+					return;
+				default:
+					break;
+			};
+		}
+
+		orig(self, actionButton);
     }
 
     public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? _) => 
