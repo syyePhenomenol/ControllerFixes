@@ -49,7 +49,12 @@ public static class ModMenu
             Blueprints.HorizontalBoolOption("Steam Nintendo Layout",
                 "Use Steam's nintendo controller layout",
                 b => settings.SteamNintendoLayout = b,
-                () => settings.SteamNintendoLayout)
+                () => settings.SteamNintendoLayout),
+
+            Blueprints.HorizontalBoolOption("Override Menu Prompts",
+                "For menu buttons, always display the menu binding regardless of contradicting jump/focus mappings.",
+                b => settings.OverrideMenuPrompts = b,
+                () => settings.OverrideMenuPrompts)
         });
 
         return MenuRef.GetMenuScreen(modListMenu);

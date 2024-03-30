@@ -7,4 +7,5 @@ public class GlobalSettings
     public bool SteamNintendoLayout = false;
     public int ButtonSkinType = -1;
     public bool NoCast = false;
+    public bool OverrideMenuPrompts = false;
 }

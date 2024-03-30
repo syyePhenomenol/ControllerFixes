@@ -17,7 +17,7 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
         InputManager.Reload();
     }
 
-	public override string GetVersion() => "1.0.2.0";
+	public override string GetVersion() => "1.0.3.0";
 
     public override void Initialize()
     {
@@ -31,6 +31,10 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
         
         // there are 3 overloads and luckily the correct overload is edited by mapi so i can il hook the orig_ version
         ILUIButtonSkins.orig_GetButtonSkinFor += GetButtonSkinForIL;
+
+		On.ControllerButtonLabel.ShowCurrentBinding += ShowCurrentBinding;
+
+		On.ActionButtonIconBase.GetButtonIcon += OverrideMenuPrompts;
     }
 
     private bool CanCast(On.HeroController.orig_CanCast orig, HeroController self)
@@ -82,7 +86,6 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
 	    {
 		    controllerDetect.ShowController(InputHandler.Instance.activeGamepadType);
 	    }
-	    
     }
 
     private void GetButtonSkinForIL(ILContext il)
@@ -334,6 +337,51 @@ public class ControllerFixes : Mod, IGlobalSettings<GlobalSettings>, ICustomMenu
             //dont edit the code
             return oldvalue;
         });
+    }
+
+	// Override mappings in the controller menu based on the Steam Nintendo layout setting
+    private void ShowCurrentBinding(On.ControllerButtonLabel.orig_ShowCurrentBinding orig, ControllerButtonLabel self)
+    {
+		if (self.transform.parent.name is not "SwitchJoyconButtons" || !settings.SteamNintendoLayout)
+		{
+			orig(self);
+			return;
+		}
+
+		var origLabel = self.controllerButton;
+
+		self.controllerButton = origLabel switch
+		{
+			InputControlType.Action1 => InputControlType.Action2,
+			InputControlType.Action2 => InputControlType.Action1,
+			InputControlType.Action3 => InputControlType.Action4,
+			InputControlType.Action4 => InputControlType.Action3,
+			_ => self.controllerButton
+		};
+
+		orig(self);
+
+		self.controllerButton = origLabel;
+    }
+
+    private void OverrideMenuPrompts(On.ActionButtonIconBase.orig_GetButtonIcon orig, ActionButtonIconBase self, HeroActionButton actionButton)
+    {
+		if (self is MenuButtonIcon && settings.OverrideMenuPrompts)
+		{
+			switch (actionButton) 
+			{
+				case HeroActionButton.JUMP:
+					orig(self, HeroActionButton.MENU_SUBMIT);
+					return;
+				case HeroActionButton.CAST:
+					orig(self, HeroActionButton.MENU_CANCEL);
+					return;
+				default:
+					break;
+			};
+		}
+
+		orig(self, actionButton);
     }
 
     public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? _) => 
